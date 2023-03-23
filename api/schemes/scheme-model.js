@@ -21,16 +21,18 @@ function find() { // EXERCISE A
     Return from this function the resulting dataset.
   */
 
+
     return db('schemes as sc') //<< this pulls in the schemes from the db as sc
-      .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id') //<< this means that 
-      //you are 'leftJoin'ing the steps and schemes together by the scheme_id
-      //which is the foreign key
-      .select('sc.*')
-      .count('st.step_id as number_of_steps')
-      .groupBy('sc.scheme_id')
+    .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id') //<< this means that 
+    //you are 'leftJoin'ing the steps and schemes together by the scheme_id
+    //which is the foreign key
+    .select('sc.*')
+    .count('st.step_id as number_of_steps')
+    .groupBy('sc.scheme_id')
+
 }
 
-function findById(scheme_id) { // EXERCISE B
+async function findById(scheme_id) { // EXERCISE B
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
 
@@ -96,7 +98,38 @@ function findById(scheme_id) { // EXERCISE B
         "steps": []
       }
   */
-}
+
+      const rows = await db('schemes as sc') //<< MADE THIS AN ASYNC FUNCTION
+      //SO THAT WE COULD SAVE 'rows'
+      .leftJoin('steps as st', 'sc.scheme_id', 'sc.scheme_id') //<< this means that 
+      //you are 'leftJoin'ing the steps and schemes together by the scheme_id
+      //which is the foreign key
+      .where('sc.scheme_id', scheme_id)
+      .select('st.*', 'sc.scheme_name')
+      .orderBy('st.step_number')
+
+      const result = {
+        scheme_id: rows[0].scheme_id,
+        scheme_name: rows[0].scheme_name,
+        steps: [],
+      } //<< this is litterally just building the 
+      //exact shape of result you want!!!!
+
+
+      rows.forEach(row => { //<< this is saying in each one that comes out
+        //push what is needed in
+        if (row.step_id) {
+          result.steps.push({
+            step_id: row.step_id,
+            step_number: row.step_number,
+            insturctions: row.insturctions,
+          })
+        }
+      })
+
+      return result
+
+    }
 
 function findSteps(scheme_id) { // EXERCISE C
   /*
