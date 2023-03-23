@@ -24,6 +24,8 @@ const checkSchemeId = async (req, res, next) => {
           status: 404, 
           message: `scheme with scheme_id ${req.params.scheme_id} not found`
         }) //<< if it doesnt exist send this back!
+      } else {
+        next()
       }
   } catch (err) {
     next(err)
@@ -39,7 +41,17 @@ const checkSchemeId = async (req, res, next) => {
   }
 */
 const validateScheme = (req, res, next) => {
+  const { scheme_name } = req.body //<< destruturing the scheme_name out of the req.body
+  if(
+    scheme_name === undefined || //<< if it is undefined
+    typeof scheme_name !== 'string' || //<< if the type is not a string
+    !scheme_name.trim() //<< if we already know it is a string we can 
+    //trim it and if it is falsey then it will not move on
+    ) {
 
+  } else {
+    next()
+  }
 }
 
 /*
